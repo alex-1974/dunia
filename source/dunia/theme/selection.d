@@ -542,6 +542,7 @@ nothrow
             highContrastDark,
             best
         )
+    )
     {
         best = highContrastDark;
     }
