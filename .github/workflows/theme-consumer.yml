@@ -8,6 +8,13 @@ on:
       - "source/**"
       - "dub.sdl"
       - ".github/workflows/theme-consumer.yml"
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "source/**"
+      - "dub.sdl"
+      - ".github/workflows/theme-consumer.yml"
   workflow_dispatch:
 
 permissions:
