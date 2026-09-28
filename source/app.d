@@ -1,11 +1,17 @@
 module app;
 
+import std.datetime.stopwatch :
+    AutoStart,
+    StopWatch;
+
 import std.stdio :
     writefln,
     writeln;
 
 import color :
-    SRgbf;
+    OklabHuef,
+    SRgbf,
+    withHue;
 
 import dunia.theme.selection :
     CandidateSelection,
@@ -53,6 +59,53 @@ private void reportCandidate(
         selection.color.encoded.r,
         selection.color.encoded.g,
         selection.color.encoded.b
+    );
+}
+
+
+
+private void benchmarkRuntimeThemeConstruction()
+{
+    enum size_t iterations = 5_000;
+
+    float checksum;
+
+    auto stopwatch =
+        StopWatch(
+            AutoStart.yes
+        );
+
+    foreach (i; 0 .. iterations)
+    {
+        const seed =
+            builtInSeed.withHue(
+                OklabHuef.fromDegrees(
+                    cast(float)(i % 360)
+                )
+            );
+
+        const theme =
+            makeSelectionTheme(
+                seed,
+                ThemeMode.dark
+            );
+
+        checksum +=
+            theme.normal.encoded.r;
+    }
+
+    stopwatch.stop();
+
+    const long elapsedNs =
+        stopwatch
+        .peek
+        .total!"nsecs";
+
+    writefln(
+        "runtime_theme_build_ns_per_theme=%.2f benchmark_checksum=%.6f",
+        cast(double)elapsedNs
+            / cast(double)iterations,
+        checksum
     );
 }
 
@@ -188,6 +241,8 @@ void main()
         3 * SelectionTheme.sizeof
         + SelectionCandidates.sizeof
     );
+
+    benchmarkRuntimeThemeConstruction();
 
     writeln(
         "Dunia color-d consumer correctness: PASS"
