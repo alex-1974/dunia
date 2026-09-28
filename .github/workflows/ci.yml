@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build / ${{ matrix.compiler }}
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - dmd-2.113.0
+          - ldc-1.43.0
+
+    steps:
+      - name: Checkout Dunia
+        uses: actions/checkout@v7
+
+      - name: Checkout current color-d consumer dependency
+        uses: actions/checkout@v7
+        with:
+          repository: alex-1974/color-d
+          ref: develop
+          path: deps/color-d
+
+      - name: Recreate workspace sibling layout
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ln -sfn "$GITHUB_WORKSPACE/deps/color-d" \
+              "$GITHUB_WORKSPACE/../color-d"
+
+          echo "dunia=$(git rev-parse HEAD)"
+          echo "color-d=$(git -C "$GITHUB_WORKSPACE/deps/color-d" rev-parse HEAD)"
+
+      - name: Install D toolchain
+        uses: dlang-community/setup-dlang@v2
+        with:
+          compiler: ${{ matrix.compiler }}
+
+      - name: Toolchain versions
+        run: |
+          "$DC" --version
+          dub --version
+
+      - name: Tests
+        run: dub test --compiler="$DC" --force
+
+      - name: Build
+        run: dub build --compiler="$DC" --force
