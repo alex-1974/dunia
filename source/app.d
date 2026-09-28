@@ -68,7 +68,7 @@ private void benchmarkRuntimeThemeConstruction()
 {
     enum size_t iterations = 5_000;
 
-    float checksum;
+    float checksum = 0.0f;
 
     auto stopwatch =
         StopWatch(
