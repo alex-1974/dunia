@@ -1,0 +1,11 @@
+/.dub/
+/.workspace/
+/docs.json
+__dummy.html
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+/dunia
+/dunia.exe
