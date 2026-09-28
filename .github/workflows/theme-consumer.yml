@@ -1,0 +1,80 @@
+name: Theme consumer
+
+on:
+  push:
+    branches:
+      - feat/color-theme-consumer
+    paths:
+      - "source/**"
+      - "dub.sdl"
+      - ".github/workflows/theme-consumer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  consumer:
+    name: Consumer / ${{ matrix.compiler }} / ${{ matrix.build }}
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: dmd-2.113.0
+            build: debug
+          - compiler: ldc-1.43.0
+            build: release
+
+    steps:
+      - name: Checkout Dunia
+        uses: actions/checkout@v7
+
+      - name: Checkout color-d
+        uses: actions/checkout@v7
+        with:
+          repository: alex-1974/color-d
+          ref: develop
+          path: deps/color-d
+
+      - name: Recreate workspace sibling dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ln -sfn "$GITHUB_WORKSPACE/deps/color-d" \
+              "$GITHUB_WORKSPACE/../color-d"
+
+          echo "dunia=$(git rev-parse HEAD)"
+          echo "color-d=$(git -C "$GITHUB_WORKSPACE/deps/color-d" rev-parse HEAD)"
+
+      - name: Install D toolchain
+        uses: dlang-community/setup-dlang@v2
+        with:
+          compiler: ${{ matrix.compiler }}
+
+      - name: Toolchain versions
+        run: |
+          "$DC" --version
+          dub --version
+
+      - name: Unit and CTFE validation
+        run: |
+          dub test \
+              --compiler="$DC" \
+              --build=${{ matrix.build }} \
+              --force
+
+      - name: Build consumer and record compile characterization
+        shell: bash
+        run: |
+          /usr/bin/time \
+              -f 'build_elapsed_s=%e build_max_rss_kb=%M' \
+              dub build \
+                  --compiler="$DC" \
+                  --build=${{ matrix.build }} \
+                  --force
+
+      - name: Run consumer
+        run: ./dunia
