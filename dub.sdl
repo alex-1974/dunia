@@ -6,3 +6,5 @@ license "MIT"
 
 targetType "executable"
 sourcePaths "source"
+
+dependency "color-d" path="../color-d"
