@@ -1,0 +1,8 @@
+name "dunia"
+description "OpenStreetMap editor application in D"
+authors "Alexander Bernardi"
+copyright "Copyright (c) 2026 Alexander Bernardi"
+license "MIT"
+
+targetType "executable"
+sourcePaths "source"
