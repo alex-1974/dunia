@@ -57,7 +57,7 @@ jobs:
           dub --version
 
       - name: Tests
-        run: dub test --compiler="$DC" --force
+        run: dub test --compiler="$DC" --build=debug --force
 
       - name: Build
         run: dub build --compiler="$DC" --force
