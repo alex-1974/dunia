@@ -16,7 +16,7 @@ Goals:
 - keep reusable library responsibilities outside Dunia;
 - establish the normal branch workflow.
 
-Status: **active**.
+Status: **complete**.
 
 ## M1 — First real theme/style consumer
 
@@ -40,3 +40,7 @@ Required evidence:
 - API-friction findings recorded back to `color-d`.
 
 This milestone does not select a GUI toolkit or renderer.
+
+Status: **complete**.
+
+Evidence: `docs/research/color-d-theme-consumer.md`.
